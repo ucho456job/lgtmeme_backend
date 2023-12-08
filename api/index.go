@@ -18,9 +18,6 @@ func myRoute(rg *gin.RouterGroup) {
 
 func init() {
 	engine = gin.New()
-	engine.GET("/", func(ctx *gin.Context) {
-		ctx.Data(http.StatusOK, "text/html", []byte("<h1>Hello World</h1>"))
-	})
 	rg := engine.Group("/api")
 	myRoute(rg)
 }
