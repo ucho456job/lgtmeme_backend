@@ -1,7 +1,7 @@
 package main
 
 import (
-	handler "LGTMeme_backend/api"
+	handler "lgtmeme_backend/api"
 	"net/http"
 )
 
