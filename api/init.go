@@ -4,9 +4,12 @@ import (
 	"lgtmeme_backend/api/config"
 	"lgtmeme_backend/api/handler"
 	"lgtmeme_backend/api/middleware"
+	"lgtmeme_backend/api/util"
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 )
 
@@ -30,6 +33,10 @@ func loadDotenv() {
 
 func initGin() *gin.RouterGroup {
 	engine = gin.New()
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("base64image", util.IsValidBase64Image)
+		v.RegisterValidation("imagesize", util.IsValidImageSize)
+	}
 	engine.Use(middleware.WriteLog)
 	rg := engine.Group("/api")
 	return rg

@@ -3,55 +3,60 @@ package util
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"lgtmeme_backend/api/config"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
 
-func ValidateStruct(ctx *gin.Context, s interface{}, customErrMsgs map[string]map[string]string) (errInfos []ErrInfo, ok bool) {
-	if err := ctx.ShouldBindJSON(&s); err != nil {
-		if e, isErr := err.(*json.UnmarshalTypeError); isErr {
-			return []ErrInfo{{
-				Field:   e.Field,
-				Tag:     "type",
-				Message: fmt.Sprintf("%s is invalid type.", e.Field),
-			}}, false
-		}
-
-		errs := err.(validator.ValidationErrors)
-		for _, e := range errs {
-			fieldErr := customErrMsgs[e.Field()]
-			msg := "Unknown error occurs."
-			if customMsg, exists := fieldErr[e.Tag()]; exists {
-				msg = customMsg
-			}
-			errInfos = append(errInfos, ErrInfo{
-				Field:   e.Field(),
-				Tag:     e.Tag(),
-				Message: msg,
-			})
-		}
-		return errInfos, false
-	}
-	return nil, true
+var IsValidImageSize validator.Func = func(fl validator.FieldLevel) bool {
+	image := fl.Field().String()
+	return len(image) < config.MAX_IMAGE_SIZE
 }
 
-func ValidateBase64Image(ctx *gin.Context, imageData string) (ok bool) {
+var IsValidBase64Image validator.Func = func(fl validator.FieldLevel) bool {
+	image := fl.Field().String()
 	var imagePrefixes = map[string]string{
 		"jpeg": "data:image/jpeg;base64,",
 		"png":  "data:image/png;base64,",
 		"webp": "data:image/webp;base64,",
 	}
 	for _, prefix := range imagePrefixes {
-		if strings.HasPrefix(imageData, prefix) {
-			base64Data := strings.TrimPrefix(imageData, prefix)
-			if _, err := base64.StdEncoding.DecodeString(base64Data); err != nil {
-				return false
+		if strings.HasPrefix(image, prefix) {
+			base64Data := strings.TrimPrefix(image, prefix)
+			if _, err := base64.StdEncoding.DecodeString(base64Data); err == nil {
+				return true
 			}
-			return true
 		}
 	}
 	return false
+}
+
+func ValidateReqBody(ctx *gin.Context, err error) (errInfos []ErrInfo) {
+	var validationErrors validator.ValidationErrors
+	if errors.As(err, &validationErrors) {
+		for _, valErr := range validationErrors {
+			errInfos = append(errInfos, ErrInfo{
+				Field:   strings.ToLower(valErr.Field()),
+				Tag:     valErr.Tag(),
+				Message: fmt.Sprintf("The field %s is invalid: %s", valErr.Field(), valErr.Error()),
+			})
+		}
+	} else if err, isErr := err.(*json.UnmarshalTypeError); isErr {
+		errInfos = append(errInfos, ErrInfo{
+			Field:   err.Field,
+			Tag:     "type",
+			Message: fmt.Sprintf("The field %s is expected to be of type %s.", err.Field, err.Type),
+		})
+	} else {
+		errInfos = append(errInfos, ErrInfo{
+			Field:   "",
+			Tag:     "binding",
+			Message: "There was an error binding the request body.",
+		})
+	}
+	return errInfos
 }
