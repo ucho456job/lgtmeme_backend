@@ -2,6 +2,7 @@ package handler
 
 import (
 	"lgtmeme_backend/api/dto"
+	"lgtmeme_backend/api/service"
 	"lgtmeme_backend/api/util"
 	"net/http"
 
@@ -17,5 +18,10 @@ func PostImageHandler(ctx *gin.Context) {
 		return
 	}
 
-	ctx.String(http.StatusCreated, "Success")
+	imageID, err := service.InsertImage(ctx, "https://sample.com", reqBody.Keyword)
+	if err != nil {
+		util.InternalServerErrorResponse(ctx)
+	}
+
+	ctx.String(http.StatusCreated, imageID)
 }
