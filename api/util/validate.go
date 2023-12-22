@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"lgtmeme_backend/api/config"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -13,7 +12,7 @@ import (
 
 var IsValidImageSize validator.Func = func(fl validator.FieldLevel) bool {
 	image := fl.Field().String()
-	return len(image) < config.MAX_IMAGE_SIZE
+	return len(image) < 1048576*4/3
 }
 
 var IsValidBase64Image validator.Func = func(fl validator.FieldLevel) bool {
