@@ -8,7 +8,6 @@ import (
 	"lgtmeme_backend/api/config"
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -35,27 +34,27 @@ var IsValidBase64Image validator.Func = func(fl validator.FieldLevel) bool {
 	return false
 }
 
-func ValidateReqBody(ctx *gin.Context, err error) (errInfos []ErrInfo) {
+func ValidateReqBody(err error) (errInfos []ErrInfo) {
 	var validationErrors validator.ValidationErrors
 	if errors.As(err, &validationErrors) {
 		for _, valErr := range validationErrors {
 			errInfos = append(errInfos, ErrInfo{
 				Field:   strings.ToLower(valErr.Field()),
 				Tag:     valErr.Tag(),
-				Message: fmt.Sprintf("The field %s is invalid: %s", valErr.Field(), valErr.Error()),
+				Message: fmt.Sprintf("%s is invalid: %s", valErr.Field(), valErr.Error()),
 			})
 		}
 	} else if err, isErr := err.(*json.UnmarshalTypeError); isErr {
 		errInfos = append(errInfos, ErrInfo{
 			Field:   err.Field,
 			Tag:     "type",
-			Message: fmt.Sprintf("The field %s is expected to be of type %s.", err.Field, err.Type),
+			Message: fmt.Sprintf("%s is expected to be of type %s", err.Field, err.Type),
 		})
 	} else {
 		errInfos = append(errInfos, ErrInfo{
 			Field:   "",
 			Tag:     "binding",
-			Message: "There was an error binding the request body.",
+			Message: "there was an error binding the request body",
 		})
 	}
 	return errInfos

@@ -12,24 +12,22 @@ type ErrInfo struct {
 	Message string `json:"message"`
 }
 
-// -------------------
-// 400
-// -------------------
 func ValidationFailedResponse(ctx *gin.Context, errInfos []ErrInfo) {
 	ctx.JSON(http.StatusBadRequest, gin.H{
 		"error_code":    "validation_failed",
-		"error_message": "Validation failed for one or more fields.",
+		"error_message": "validation failed for one or more fields",
 		"errors":        errInfos,
 	})
 }
 
-// -------------------
-// 500
-// -------------------
-func InternalServerErrorResponse(ctx *gin.Context) {
+func InternalServerErrorResponse(ctx *gin.Context, err error) {
 	ctx.JSON(http.StatusInternalServerError, gin.H{
 		"error_code":    "internal_server_error",
-		"error_message": "",
-		"erros":         ErrInfo{},
+		"error_message": "internal server error occurs",
+		"errors": []ErrInfo{{
+			Field:   "",
+			Tag:     "",
+			Message: err.Error(),
+		}},
 	})
 }
