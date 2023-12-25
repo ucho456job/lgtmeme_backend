@@ -32,7 +32,7 @@ func init() {
 }
 
 func loadDotenv() {
-	if os.Getenv("ENVIRONMENT") != "production" {
+	if os.Getenv("GIN_MODE") == "debug" {
 		err := godotenv.Load(".env")
 		if err != nil {
 			log.Fatalf("Error loading .env file: %v", err)
