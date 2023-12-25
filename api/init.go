@@ -1,10 +1,10 @@
 package api
 
 import (
-	"lgtmeme_backend/api/config"
-	"lgtmeme_backend/api/handler"
-	"lgtmeme_backend/api/middleware"
-	"lgtmeme_backend/api/util"
+	"lgtmeme_backend/api/_pkg/config"
+	"lgtmeme_backend/api/_pkg/handler"
+	"lgtmeme_backend/api/_pkg/middleware"
+	"lgtmeme_backend/api/_pkg/util"
 	"log"
 
 	"github.com/gin-gonic/gin"

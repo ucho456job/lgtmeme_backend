@@ -1,8 +1,8 @@
 package service
 
 import (
-	"lgtmeme_backend/api/config"
-	"lgtmeme_backend/api/model"
+	"lgtmeme_backend/api/_pkg/config"
+	"lgtmeme_backend/api/_pkg/model"
 	"log"
 	"time"
 

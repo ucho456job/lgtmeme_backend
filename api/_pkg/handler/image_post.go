@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"lgtmeme_backend/api/dto"
-	"lgtmeme_backend/api/service"
-	"lgtmeme_backend/api/util"
+	"lgtmeme_backend/api/_pkg/dto"
+	"lgtmeme_backend/api/_pkg/service"
+	"lgtmeme_backend/api/_pkg/util"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
