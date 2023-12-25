@@ -7,6 +7,7 @@ import (
 	"lgtmeme_backend/api/_pkg/util"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -31,9 +32,11 @@ func init() {
 }
 
 func loadDotenv() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+	if os.Getenv("ENVIRONMENT") != "production" {
+		err := godotenv.Load(".env")
+		if err != nil {
+			log.Fatalf("Error loading .env file: %v", err)
+		}
 	}
 }
 
