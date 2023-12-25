@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"lgtmeme_backend/api/_pkg/config"
 	"lgtmeme_backend/api/_pkg/handler"
 	"lgtmeme_backend/api/_pkg/middleware"
@@ -32,6 +33,8 @@ func init() {
 }
 
 func loadDotenv() {
+	fmt.Println(os.Getenv("GIN_MODE"))
+	fmt.Println(os.Getenv("DB_HOST"))
 	if os.Getenv("GIN_MODE") == "debug" {
 		err := godotenv.Load(".env")
 		if err != nil {
