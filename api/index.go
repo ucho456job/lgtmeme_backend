@@ -45,6 +45,7 @@ func initGin() *gin.RouterGroup {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("base64image", util.IsValidBase64Image)
 		v.RegisterValidation("imagesize", util.IsValidImageSize)
+		v.RegisterValidation("uuidslice", util.IsValidUuidSlice)
 	}
 	engine.Use(middleware.WriteLog)
 	rg := engine.Group("/api")
