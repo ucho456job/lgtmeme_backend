@@ -14,15 +14,14 @@ func PostImageHandler(ctx *gin.Context) {
 	var reqBody dto.PostImageReqBody
 
 	if err := ctx.ShouldBindJSON(&reqBody); err != nil {
-		errInfos := util.ValidateReqBody(err)
+		errInfos := util.MakeValidateErrInfos(err)
 		util.ValidationFailedResponse(ctx, errInfos)
 		return
 	}
 
 	imageID := uuid.New().String()
-	base64Image := reqBody.Image
 
-	imageURL, err := service.UploadImageToStorage(ctx, imageID, base64Image)
+	imageURL, err := service.UploadImageToStorage(ctx, imageID, reqBody.Base64image)
 	if err != nil {
 		util.InternalServerErrorResponse(ctx, err)
 		return
@@ -40,4 +39,32 @@ func PostImageHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{
 		"image_url": imageURL,
 	})
+}
+
+func GetImageHandler(ctx *gin.Context) {
+	var query dto.GetImagesQuery
+
+	if err := ctx.ShouldBindQuery(&query); err != nil {
+		errInfos := util.MakeValidateErrInfos(err)
+		util.ValidationFailedResponse(ctx, errInfos)
+		return
+	}
+
+	images, err := service.SelectImages(ctx, query.Page, query.Keyword, query.Sort, query.FavoriteIDs, query.AuthCheck)
+	if err != nil {
+		util.InternalServerErrorResponse(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"images": images,
+	})
+}
+
+func PatchImageHandler(ctx *gin.Context) {
+	//
+}
+
+func DeleteImageHandler(ctx *gin.Context) {
+	//
 }

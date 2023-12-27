@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 )
 
 var IsValidImageSize validator.Func = func(fl validator.FieldLevel) bool {
@@ -33,7 +35,34 @@ var IsValidBase64Image validator.Func = func(fl validator.FieldLevel) bool {
 	return false
 }
 
-func ValidateReqBody(err error) (errInfos []ErrInfo) {
+var IsValidUuidSlice validator.Func = func(fl validator.FieldLevel) bool {
+	field := fl.Field()
+
+	if field.Kind() != reflect.Slice || field.IsNil() {
+		return true
+	}
+
+	if field.Len() == 0 {
+		return true
+	}
+
+	for i := 0; i < field.Len(); i++ {
+		if id, ok := field.Index(i).Interface().(string); ok {
+			if id != "" {
+				_, err := uuid.Parse(id)
+				if err != nil {
+					return false
+				}
+			}
+		} else {
+			return false
+		}
+	}
+
+	return true
+}
+
+func MakeValidateErrInfos(err error) (errInfos []ErrInfo) {
 	var validationErrors validator.ValidationErrors
 	if errors.As(err, &validationErrors) {
 		for _, valErr := range validationErrors {
