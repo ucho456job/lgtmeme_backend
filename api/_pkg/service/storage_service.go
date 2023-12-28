@@ -60,7 +60,7 @@ func decodeBase64Image(base64Image string) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(dataParts[1])
 }
 
-func buildStorageURL(ID, contentType string, public bool) string {
+func buildStorageURL(ID string, contentType string, public bool) string {
 	extension := map[string]string{
 		"image/jpeg": "jpg",
 		"image/png":  "png",

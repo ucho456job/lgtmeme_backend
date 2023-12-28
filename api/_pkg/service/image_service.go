@@ -2,6 +2,7 @@ package service
 
 import (
 	"lgtmeme_backend/api/_pkg/config"
+	"lgtmeme_backend/api/_pkg/dto"
 	"lgtmeme_backend/api/_pkg/entity"
 	"log"
 	"time"
@@ -26,7 +27,7 @@ func InsertImage(ctx *gin.Context, ID string, url string, keyword string) error 
 	return nil
 }
 
-func SelectImages(ctx *gin.Context, page int, keyword string, sort string, favoriteImageIDs []string, authCheck bool) (images []struct {
+func SelectImages(ctx *gin.Context, page int, keyword string, sort dto.GetImageSort, favoriteImageIDs []string, authCheck bool) (images []struct {
 	ID  string `json:"id"`
 	URL string `json:"url"`
 }, err error) {
@@ -43,7 +44,7 @@ func SelectImages(ctx *gin.Context, page int, keyword string, sort string, favor
 		q = q.Where("confirmed = ?", false)
 		q = q.Where("reported = ?", true)
 	}
-	if sort == "popular" {
+	if sort == dto.GetImageSortPopular {
 		q = q.Order("used_count DESC, created_at DESC")
 	} else {
 		q = q.Order("created_at DESC")
@@ -69,14 +70,14 @@ func ExistsImage(ctx *gin.Context, ID string) (exists bool, err error) {
 	return count > 0, nil
 }
 
-func UpdateImage(ctx *gin.Context, ID string, requestType string) error {
+func UpdateImage(ctx *gin.Context, ID string, requestType dto.PatchImageReqType) error {
 	var updateData map[string]interface{}
 	switch requestType {
-	case "used":
+	case dto.PatchImageReqTypeUsed:
 		updateData = map[string]interface{}{"used_count": gorm.Expr("used_count + ?", 1)}
-	case "reporting":
+	case dto.PatchImageReqTypeReporting:
 		updateData = map[string]interface{}{"reported": true}
-	case "confirmed":
+	case dto.PatchImageReqTypeConfirmed:
 		updateData = map[string]interface{}{"confirmed": true}
 	}
 
