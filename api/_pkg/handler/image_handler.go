@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"lgtmeme_backend/api/_pkg/dto"
 	"lgtmeme_backend/api/_pkg/service"
 	"lgtmeme_backend/api/_pkg/util"
@@ -12,7 +13,6 @@ import (
 
 func PostImageHandler(ctx *gin.Context) {
 	var reqBody dto.PostImageReqBody
-
 	if err := ctx.ShouldBindJSON(&reqBody); err != nil {
 		errInfos := util.MakeValidateErrInfos(err)
 		util.ValidationFailedResponse(ctx, errInfos)
@@ -41,9 +41,8 @@ func PostImageHandler(ctx *gin.Context) {
 	})
 }
 
-func GetImageHandler(ctx *gin.Context) {
+func GetImagesHandler(ctx *gin.Context) {
 	var query dto.GetImagesQuery
-
 	if err := ctx.ShouldBindQuery(&query); err != nil {
 		errInfos := util.MakeValidateErrInfos(err)
 		util.ValidationFailedResponse(ctx, errInfos)
@@ -62,7 +61,37 @@ func GetImageHandler(ctx *gin.Context) {
 }
 
 func PatchImageHandler(ctx *gin.Context) {
-	//
+	imageID := ctx.Param("image_id")
+	if ok := util.IsValidUUID(imageID); !ok {
+		errInfos := util.MakeValidateErrInfosForUUID(imageID, "image_id")
+		util.ValidationFailedResponse(ctx, errInfos)
+		return
+	}
+
+	var reqBody dto.PatchImageReqBody
+	if err := ctx.ShouldBindJSON(&reqBody); err != nil {
+		errInfos := util.MakeValidateErrInfos(err)
+		util.ValidationFailedResponse(ctx, errInfos)
+		return
+	}
+
+	exists, err := service.ExistsImage(ctx, imageID)
+	if err != nil {
+		util.InternalServerErrorResponse(ctx, err)
+		return
+	}
+	if !exists {
+		msg := fmt.Sprintf("image with id: %s was not found", imageID)
+		util.ResourceNotFoundResponse(ctx, msg)
+		return
+	}
+
+	if err := service.UpdateImage(ctx, imageID, reqBody.Type); err != nil {
+		util.InternalServerErrorResponse(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{})
 }
 
 func DeleteImageHandler(ctx *gin.Context) {

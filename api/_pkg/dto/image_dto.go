@@ -12,3 +12,7 @@ type GetImagesQuery struct {
 	FavoriteIDs []string `form:"favorite_ids" binding:"omitempty,uuidslice"`
 	AuthCheck   bool     `form:"auth_check" binding:"omitempty"`
 }
+
+type PatchImageReqBody struct {
+	Type string `json:"type" binding:"required,oneof=used reporting confirmed"`
+}

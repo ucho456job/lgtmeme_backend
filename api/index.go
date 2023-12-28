@@ -45,7 +45,7 @@ func initGin() *gin.RouterGroup {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("base64image", util.IsValidBase64Image)
 		v.RegisterValidation("imagesize", util.IsValidImageSize)
-		v.RegisterValidation("uuidslice", util.IsValidUuidSlice)
+		v.RegisterValidation("uuidslice", util.IsValidUUIDSlice)
 	}
 	engine.Use(middleware.WriteLog)
 	rg := engine.Group("/api")
@@ -56,7 +56,7 @@ func initRoute(rg *gin.RouterGroup) {
 	rg.GET("/health", handler.Health)
 
 	rg.POST("/images", handler.PostImageHandler)
-	rg.GET("/images", handler.GetImageHandler)
-	rg.PATCH("/images", handler.PatchImageHandler)
-	rg.DELETE("/images", handler.DeleteImageHandler)
+	rg.GET("/images", handler.GetImagesHandler)
+	rg.PATCH("/images/:image_id", handler.PatchImageHandler)
+	rg.DELETE("/images/:image_id", handler.DeleteImageHandler)
 }

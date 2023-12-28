@@ -35,7 +35,7 @@ var IsValidBase64Image validator.Func = func(fl validator.FieldLevel) bool {
 	return false
 }
 
-var IsValidUuidSlice validator.Func = func(fl validator.FieldLevel) bool {
+var IsValidUUIDSlice validator.Func = func(fl validator.FieldLevel) bool {
 	field := fl.Field()
 
 	if field.Kind() != reflect.Slice || field.IsNil() {
@@ -86,4 +86,17 @@ func MakeValidateErrInfos(err error) (errInfos []ErrInfo) {
 		})
 	}
 	return errInfos
+}
+
+func IsValidUUID(id string) (ok bool) {
+	_, err := uuid.Parse(id)
+	return err == nil
+}
+
+func MakeValidateErrInfosForUUID(uuid string, field string) (errInfos []ErrInfo) {
+	return []ErrInfo{{
+		Field:   field,
+		Tag:     "uuid",
+		Message: fmt.Sprintf("%s is invalid uuid: %s", field, uuid),
+	}}
 }
