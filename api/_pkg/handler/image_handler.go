@@ -95,5 +95,39 @@ func PatchImageHandler(ctx *gin.Context) {
 }
 
 func DeleteImageHandler(ctx *gin.Context) {
-	//
+	imageID := ctx.Param("image_id")
+	if ok := util.IsValidUUID(imageID); !ok {
+		errInfos := util.MakeValidateErrInfosForUUID(imageID, "image_id")
+		util.ValidationFailedResponse(ctx, errInfos)
+		return
+	}
+
+	exists, err := service.ExistsImage(ctx, imageID)
+	if err != nil {
+		util.InternalServerErrorResponse(ctx, err)
+		return
+	}
+	if !exists {
+		msg := fmt.Sprintf("image with id: %s was not found", imageID)
+		util.ResourceNotFoundResponse(ctx, msg)
+		return
+	}
+
+	imageURL, err := service.SelectImageURL(ctx, imageID)
+	if err != nil {
+		util.InternalServerErrorResponse(ctx, err)
+		return
+	}
+
+	if err := service.DeleteImage(ctx, imageID); err != nil {
+		util.InternalServerErrorResponse(ctx, err)
+		return
+	}
+
+	if err := service.DeleteImageFromStorage(imageURL); err != nil {
+		util.InternalServerErrorResponse(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusNoContent, gin.H{})
 }

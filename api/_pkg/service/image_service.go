@@ -17,7 +17,6 @@ func InsertImage(ctx *gin.Context, ID string, url string, keyword string) error 
 		Keyword:   keyword,
 		CreatedAt: time.Now(),
 	}
-
 	result := config.DB.Table("images").Create(&newImage)
 	if result.Error != nil {
 		log.Printf("Failed to insert image: %v", result.Error)
@@ -72,7 +71,6 @@ func ExistsImage(ctx *gin.Context, ID string) (exists bool, err error) {
 
 func UpdateImage(ctx *gin.Context, ID string, requestType string) error {
 	var updateData map[string]interface{}
-
 	switch requestType {
 	case "used":
 		updateData = map[string]interface{}{"used_count": gorm.Expr("used_count + ?", 1)}
@@ -85,6 +83,29 @@ func UpdateImage(ctx *gin.Context, ID string, requestType string) error {
 	result := config.DB.Table("images").Where("id = ?", ID).Updates(updateData)
 	if result.Error != nil {
 		log.Printf("Failed to update image: %v", result.Error)
+		return result.Error
+	}
+
+	return nil
+}
+
+func SelectImageURL(ctx *gin.Context, ID string) (imageURL string, err error) {
+	var resultStruct struct {
+		URL string `json:"url"`
+	}
+	result := config.DB.Select("url").Table("images").Where("id = ?", ID).First(&resultStruct)
+	if result.Error != nil {
+		log.Printf("Failed to SelectImageURL: %v", result.Error)
+		return "", result.Error
+	}
+
+	return resultStruct.URL, nil
+}
+
+func DeleteImage(ctx *gin.Context, ID string) error {
+	result := config.DB.Table("images").Where("id = ?", ID).Delete(&entity.Image{})
+	if result.Error != nil {
+		log.Printf("Failed to delete image: %v", result.Error)
 		return result.Error
 	}
 
