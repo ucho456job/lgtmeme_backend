@@ -49,7 +49,7 @@ func GetImagesHandler(ctx *gin.Context) {
 		return
 	}
 
-	images, err := service.SelectImages(ctx, query.Page, query.Keyword, query.Sort, query.FavoriteIDs, query.AuthCheck)
+	images, err := service.SelectImages(ctx, query.Page, query.Keyword, query.Sort, query.FavoriteImageIDs, query.AuthCheck)
 	if err != nil {
 		util.InternalServerErrorResponse(ctx, err)
 		return
