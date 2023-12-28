@@ -20,6 +20,18 @@ func ValidationFailedResponse(ctx *gin.Context, errInfos []ErrInfo) {
 	})
 }
 
+func ResourceNotFoundResponse(ctx *gin.Context, errMsg string) {
+	ctx.JSON(http.StatusNotFound, gin.H{
+		"error_code":    "resource_not_found",
+		"error_message": "resource not found",
+		"erros": []ErrInfo{{
+			Field:   "",
+			Tag:     "",
+			Message: errMsg,
+		}},
+	})
+}
+
 func InternalServerErrorResponse(ctx *gin.Context, err error) {
 	ctx.JSON(http.StatusInternalServerError, gin.H{
 		"error_code":    "internal_server_error",
