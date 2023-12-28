@@ -26,15 +26,15 @@ func InsertImage(ctx *gin.Context, ID string, url string, keyword string) error 
 	return nil
 }
 
-func SelectImages(ctx *gin.Context, page int, keyword string, sort string, favoriteIDs []string, authCheck bool) (images []struct {
+func SelectImages(ctx *gin.Context, page int, keyword string, sort string, favoriteImageIDs []string, authCheck bool) (images []struct {
 	ID  string `json:"id"`
 	URL string `json:"url"`
 }, err error) {
 	q := config.DB
 	q = q.Select("id", "url")
 	q = q.Table("images")
-	if len(favoriteIDs) > 0 {
-		q = q.Where("id IN ?", favoriteIDs)
+	if len(favoriteImageIDs) > 0 {
+		q = q.Where("id IN ?", favoriteImageIDs)
 	}
 	if keyword != "" {
 		q = q.Where("keyword LIKE ?", "%"+keyword+"%")
